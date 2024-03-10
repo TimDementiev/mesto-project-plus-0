@@ -1,24 +1,32 @@
-import { Request, Response, NextFunction } from 'express';
-import User from '../models/user';
-import Errors from '../errors/errors';
-import { AuthRequest } from '../middlewares/authorization';
+import { Request, Response, NextFunction } from "express";
+import User from "../models/user";
+import Errors from "../errors/errors";
+import { CustomRequest } from "../utils/interfaces";
 
-export const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
+export const getAllUsers = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   User.find({})
-    .select('-__v')
+    .select("-__v")
     .then((users) => res.send(users))
     .catch(next);
 };
 
-export const getUserById = (req: Request, res: Response, next: NextFunction) => {
+export const getUserById = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   User.findById(req.params.userId)
-    .select('-__v')
+    .select("-__v")
     .then((user) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(Errors.notFound());
+      if (err.name === "CastError") {
+        next(Errors.notFoundRequest());
       } else {
         next(err);
       }
@@ -37,7 +45,7 @@ export const postUser = (req: Request, res: Response, next: NextFunction) => {
       });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === "ValidationError") {
         next(Errors.badRequest());
       } else {
         next(err);
@@ -45,7 +53,11 @@ export const postUser = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-export const patchUser = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const patchUser = (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   const _id = req.user?._id;
   const { name, about, avatar } = req.body;
   User.findOneAndUpdate(
@@ -54,17 +66,17 @@ export const patchUser = (req: AuthRequest, res: Response, next: NextFunction) =
     {
       new: true,
       runValidators: true,
-    },
+    }
   )
-    .select('-__v')
+    .select("-__v")
     .then((user) => {
       if (!user) {
-        throw Errors.notFound();
+        throw Errors.notFoundRequest();
       }
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === "ValidationError") {
         next(Errors.badRequest());
       } else {
         next(err);
@@ -72,7 +84,11 @@ export const patchUser = (req: AuthRequest, res: Response, next: NextFunction) =
     });
 };
 
-export const patchUserAvatar = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const patchUserAvatar = (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   const _id = req.user?._id;
   const { avatar } = req.body;
   User.findOneAndUpdate(
@@ -81,17 +97,17 @@ export const patchUserAvatar = (req: AuthRequest, res: Response, next: NextFunct
     {
       new: true,
       runValidators: true,
-    },
+    }
   )
-    .select('-__v')
+    .select("-__v")
     .then((user) => {
       if (!user) {
-        throw Errors.notFound();
+        throw Errors.notFoundRequest();
       }
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === "ValidationError") {
         next(Errors.badRequest());
       } else {
         next(err);

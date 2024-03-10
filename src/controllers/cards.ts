@@ -1,37 +1,34 @@
-import { NextFunction, Request, Response } from 'express';
-import Errors from '../errors/errors';
-import Card from '../models/card';
-import { AuthRequest } from '../middlewares/authorization';
+import { NextFunction, Request, Response } from "express";
+import Errors from "../errors/errors";
+import Card from "../models/card";
+import { CustomRequest } from "../utils/interfaces";
 
 export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({})
-    .select('-__v')
+    .select("-__v")
     .then((cards) => {
       res.send(cards);
     })
     .catch(next);
 };
 
-export const postCard = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const postCard = (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   const userId = req.user?._id;
-  const {
-    name,
-    link,
-    likes,
-    createdAt,
-  } = req.body;
+  const { name, link } = req.body;
   Card.create({
     name,
     link,
     owner: userId,
-    likes,
-    createdAt,
   })
     .then((card) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === "ValidationError") {
         next(Errors.badRequest());
       } else {
         next(err);
@@ -43,38 +40,42 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw Errors.notFound();
+        throw Errors.notFoundRequest();
       }
       res.send({
-        message: 'Карточка удалена',
+        message: "Карточка удалена",
       });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(Errors.notFound());
+      if (err.name === "CastError") {
+        next(Errors.notFoundRequest());
       } else {
         next(err);
       }
     });
 };
 
-export const putLike = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const likeCard = (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   const userId = req.user?._id;
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: userId } },
-    { new: true },
+    { new: true }
   )
     .then((card) => {
       if (!card) {
-        throw Errors.notFound();
+        throw Errors.notFoundRequest();
       }
       res.send({
-        message: 'Лайк поставлен',
+        message: "Лайк поставлен",
       });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === "CastError") {
         next(Errors.badRequest());
       } else {
         next(err);
@@ -82,26 +83,32 @@ export const putLike = (req: AuthRequest, res: Response, next: NextFunction) => 
     });
 };
 
-export const deleteLike = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const userId = req.user?._id;
+export const dislikeCard = (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const userId = req.user?._id || {};
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: userId } },
-    { new: true },
+    { new: true }
   )
     .then((card) => {
       if (!card) {
-        throw Errors.notFound();
+        throw Errors.notFoundRequest();
       }
-      res.send({
-        message: 'Лайк удален',
-      });
+      res.send(
+        // card
+        {message: "Лайк удален"}
+        );
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === "CastError") {
         next(Errors.badRequest());
       } else {
         next(err);
       }
     });
 };
+

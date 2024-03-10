@@ -1,22 +1,23 @@
-import { BAD_REQUEST, NOT_FOUND } from '../constants/errors';
+import { BAD_REQUEST, NOT_FOUND_REQUEST, NOT_FOUND_PAGE } from '../constants/errors';
 
 class Errors extends Error {
   status: number;
 
-  message: string;
-
   constructor(status: number, message: string) {
-    super();
+    super(message);
     this.status = status;
-    this.message = message;
   }
 
   static badRequest() {
     return new Errors(BAD_REQUEST.code, BAD_REQUEST.message);
   }
 
-  static notFound() {
-    return new Errors(NOT_FOUND.code, NOT_FOUND.message);
+  static notFoundRequest() {
+    return new Errors(NOT_FOUND_REQUEST.code, NOT_FOUND_REQUEST.message);
+  }
+
+  static notFoundPage() {
+    return new Errors(NOT_FOUND_PAGE.code, NOT_FOUND_PAGE.message);
   }
 }
 
