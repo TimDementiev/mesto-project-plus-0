@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 interface ICard {
   name: string;
@@ -8,35 +8,33 @@ interface ICard {
   createdAt: Date;
 }
 
-const cardSchema = new mongoose.Schema<ICard>(
-  {
-    name: {
-      type: String,
-      minlength: 2,
-      maxlength: 30,
-      required: true,
-    },
-    link: {
-      type: String,
-      required: true,
-      match: /^https?:\/\/.+/,
-    },
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'user',
-      required: true,
-    },
-    likes:  {
-      // type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'user',
-      default: [],
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
+const cardSchema = new mongoose.Schema<ICard>({
+  name: {
+    type: String,
+    minlength: 2,
+    maxlength: 30,
+    required: true,
   },
-);
+  link: {
+    type: String,
+    required: true,
+    match: /^https?:\/\/.+/,
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    required: true,
+  },
+  likes: {
+    // type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "user",
+    default: [],
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
-export default mongoose.model<ICard>('card', cardSchema);
+export default mongoose.model<ICard>("card", cardSchema);
